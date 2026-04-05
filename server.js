@@ -173,14 +173,18 @@ app.post("/calcular", (req, res) => {
 
 app.get("/ceu", async (req, res) => {
     try {
-        const latitude = -23.55; // São Paulo
-        const longitude = -46.63;
-        const elevation = 0;
+        const latitude = "-23.55";
+        const longitude = "-46.63";
+        const elevation = "0";
 
         const agora = new Date();
+
         const from_date = agora.toISOString().split("T")[0];
-        const to_date = agora.toISOString().split("T")[0];
-        const time = agora.toISOString().split("T")[1].split(".")[0];
+        const to_date = from_date;
+
+        const time = agora.toLocaleTimeString("en-GB", {
+            hour12: false,
+        });
 
         const auth = Buffer
             .from(`${process.env.ASTRO_APP_ID}:${process.env.ASTRO_APP_SECRET}`)
@@ -199,27 +203,16 @@ app.get("/ceu", async (req, res) => {
                     from_date,
                     to_date,
                     time,
-                    bodies: "mercury,venus,mars,jupiter,saturn,uranus,neptune,pluto",
+                    bodies: "mercury,venus,mars,jupiter,saturn",
                 },
             }
         );
 
+        console.log("API RESPONSE:", response.data);
+
         const rows = response?.data?.data?.table?.rows || [];
 
-        const planetas = rows.filter((r) =>
-            [
-                "Mercury",
-                "Venus",
-                "Mars",
-                "Jupiter",
-                "Saturn",
-                "Uranus",
-                "Neptune",
-                "Pluto",
-            ].includes(r.entry.name)
-        );
-
-        const visiveis = planetas
+        const visiveis = rows
             .filter((p) => p.cells[0].position.altitude.degrees > 0)
             .map((p) => ({
                 nome: p.entry.name,
