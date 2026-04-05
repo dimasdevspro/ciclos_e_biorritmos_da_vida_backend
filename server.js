@@ -180,12 +180,15 @@ app.get("/ceu", async (req, res) => {
         const date = agora.toISOString().split("T")[0];
         const time = agora.toTimeString().split(" ")[0];
 
+        const auth = Buffer
+            .from(`${process.env.ASTRO_APP_ID}:${process.env.ASTRO_APP_SECRET}`)
+            .toString("base64");
+
         const response = await axios.get(
             "https://api.astronomyapi.com/api/v2/bodies/positions",
             {
                 headers: {
-                    'app_id': ASTRO_APP_ID,
-                    'app_secret': ASTRO_APP_SECRET,
+                    Authorization: `Basic ${auth}`,
                 },
                 params: {
                     latitude: lat,
