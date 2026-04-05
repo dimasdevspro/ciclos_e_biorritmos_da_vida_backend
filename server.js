@@ -173,8 +173,9 @@ app.post("/calcular", (req, res) => {
 
 app.get("/ceu", async (req, res) => {
     try {
-        const lat = -23.55; // São Paulo
-        const lon = -46.63;
+        const latitude = -23.55; // São Paulo
+        const longitude = -46.63;
+        const elevation = 0;
 
         const agora = new Date();
         const date = agora.toISOString().split("T")[0];
