@@ -197,12 +197,13 @@ app.get("/ceu", async (req, res) => {
                     from_date: date,
                     to_date: date,
                     time: time,
+                    bodies: "mercury,venus,mars,jupiter,saturn,uranus,neptune,pluto",
                 },
             }
         );
 
-        const rows = response.data.data.table.rows;
-        // 🔎 pegar só planetas
+        const rows = response?.data?.data?.table?.rows || [];
+
         const planetas = rows.filter((r) =>
             [
                 "Mercury",
@@ -216,7 +217,6 @@ app.get("/ceu", async (req, res) => {
             ].includes(r.entry.name)
         );
 
-        // 🌌 filtrar visíveis (acima do horizonte)
         const visiveis = planetas
             .filter((p) => p.cells[0].position.altitude.degrees > 0)
             .map((p) => ({
