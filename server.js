@@ -183,6 +183,10 @@ app.get("/ceu", async (req, res) => {
         const response = await axios.get(
             "https://api.astronomyapi.com/api/v2/bodies/positions",
             {
+                headers: {
+                    'app_id': ASTRO_APP_ID,
+                    'app_secret': ASTRO_APP_SECRET,
+                },
                 params: {
                     latitude: lat,
                     longitude: lon,
@@ -190,8 +194,6 @@ app.get("/ceu", async (req, res) => {
                     from_date: date,
                     to_date: date,
                     time: time,
-                    app_id: ASTRO_APP_ID,
-                    app_secret: ASTRO_APP_SECRET,
                 },
             }
         );
