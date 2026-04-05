@@ -179,7 +179,7 @@ app.get("/ceu", async (req, res) => {
 
         const agora = new Date();
         const date = agora.toISOString().split("T")[0];
-        const time = agora.toTimeString().split(" ")[0];
+        const time = agora.toISOString().split("T")[1].split(".")[0];
 
         const auth = Buffer
             .from(`${process.env.ASTRO_APP_ID}:${process.env.ASTRO_APP_SECRET}`)
@@ -195,9 +195,9 @@ app.get("/ceu", async (req, res) => {
                     latitude,
                     longitude,
                     elevation,
-                    from_date,
-                    to_date,
-                    time,
+                    from_date: date,
+                    to_date: date,
+                    time: time,
                     bodies: "mercury,venus,mars,jupiter,saturn,uranus,neptune,pluto",
                 },
             }
