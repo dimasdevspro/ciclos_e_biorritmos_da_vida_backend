@@ -191,12 +191,12 @@ app.get("/ceu", async (req, res) => {
                     Authorization: `Basic ${auth}`,
                 },
                 params: {
-                    latitude: lat,
-                    longitude: lon,
-                    elevation: 0,
-                    from_date: date,
-                    to_date: date,
-                    time: time,
+                    latitude,
+                    longitude,
+                    elevation,
+                    from_date,
+                    to_date,
+                    time,
                     bodies: "mercury,venus,mars,jupiter,saturn,uranus,neptune,pluto",
                 },
             }
