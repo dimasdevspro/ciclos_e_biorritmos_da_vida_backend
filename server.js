@@ -267,14 +267,32 @@ app.get("/lua", async (req, res) => {
 
         const moon = response.data.astronomy;
 
+        const fasesLua = {
+            "new_moon": "Lua Nova",
+            "waxing_crescent": "Crescente",
+            "first_quarter": "Quarto Crescente",
+            "waxing_gibbous": "Crescente Gibosa",
+            "full_moon": "Lua Cheia",
+            "waning_gibbous": "Minguante Gibosa",
+            "last_quarter": "Quarto Minguante",
+            "waning_crescent": "Minguante",
+        };
+
+        const faseRaw = moon.moon_phase;
+
+        const faseNormalizada = faseRaw
+            ?.toLowerCase()
+            ?.trim();
+
+        const faseTraduzida = fasesLua[faseNormalizada] || faseRaw;
+
         res.json({
-            fase: moon.moon_phase,                    // ex: WANING_GIBBOUS
-            iluminacao: parseFloat(moon.moon_illumination_percentage) / 100, // normalizar para 0-1
-            idade: "não disponível",                 // IPGeolocation não fornece idade da lua
-            moonrise: moon.moonrise,                 // ex: 22:53
-            moonset: moon.moonset,                   // ex: 07:59
-            moon_altitude: moon.moon_altitude,       // altitude acima do horizonte
-            moon_distance: moon.moon_distance,       // distância em km
+            fase: faseTraduzida,
+            iluminacao: parseFloat(moon.moon_illumination_percentage) / 100,
+            moonrise: moon.moonrise,
+            moonset: moon.moonset,
+            moon_altitude: moon.moon_altitude,
+            moon_distance: moon.moon_distance,
         });
 
     } catch (error) {
