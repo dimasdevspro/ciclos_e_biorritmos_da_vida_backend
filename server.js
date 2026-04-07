@@ -173,25 +173,22 @@ app.post("/calcular", (req, res) => {
 
 app.get("/ceu", async (req, res) => {
     try {
-        const latitude = "-23.55";
-        const longitude = "-46.63";
-        const elevation = "0";
+        const latitude = -23.55; // São Paulo
+        const longitude = -46.63;
+        const elevation = 0;
 
         const agora = new Date();
 
         const from_date = agora.toISOString().split("T")[0];
         const to_date = from_date;
 
-        const time = agora.toISOString().split("T")[1].split(".")[0];
-
-        const auth = Buffer
-            .from(`${process.env.ASTRO_APP_ID}:${process.env.ASTRO_APP_SECRET}`)
-            .toString("base64");
-
-        console.log("AUTH CHECK:", {
-            id: process.env.ASTRO_APP_ID,
-            secret: process.env.ASTRO_APP_SECRET ? "OK" : "MISSING",
+        const time = agora.toLocaleTimeString("en-GB", {
+            hour12: false,
         });
+
+        const auth = Buffer.from(
+            `${process.env.ASTRO_APP_ID}:${process.env.ASTRO_APP_SECRET}`
+        ).toString("base64");
 
         const response = await axios.get(
             "https://api.astronomyapi.com/api/v2/bodies/positions",
@@ -211,26 +208,41 @@ app.get("/ceu", async (req, res) => {
             }
         );
 
-        console.log("API RESPONSE:", response.data);
-
         const rows = response?.data?.data?.table?.rows || [];
 
         const visiveis = rows
-            .filter((p) => p?.cells?.[0]?.position?.altitude?.degrees > 0)
-            .map((p) => ({
-                nome: p.entry.name,
-                altitude: p.cells[0].position.altitude.degrees.toFixed(2),
-            }));
+            .filter((p) => {
+                const alt =
+                    p?.cells?.[0]?.position?.horizontal?.altitude?.degrees ??
+                    p?.cells?.[0]?.position?.horizonal?.altitude?.degrees;
+
+                return Number(alt) > 0;
+            })
+            .map((p) => {
+                const alt =
+                    p?.cells?.[0]?.position?.horizontal?.altitude?.degrees ??
+                    p?.cells?.[0]?.position?.horizonal?.altitude?.degrees;
+
+                return {
+                    nome: p.entry.name,
+                    altitude: Number(alt).toFixed(2),
+                };
+            });
 
         res.json({
-            visiveis,
-            total: visiveis.length,
+            visiveis: visiveis || [],
+            total: visiveis?.length || 0,
             timestamp: agora,
         });
 
     } catch (error) {
         console.error("Erro API:", error.response?.data || error.message);
-        res.status(500).json({ error: "Erro ao buscar céu atual" });
+
+        res.json({
+            visiveis: [],
+            total: 0,
+            erro: true,
+        });
     }
 });
 
