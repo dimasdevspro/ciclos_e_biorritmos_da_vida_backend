@@ -182,13 +182,16 @@ app.get("/ceu", async (req, res) => {
         const from_date = agora.toISOString().split("T")[0];
         const to_date = from_date;
 
-        const time = agora.toLocaleTimeString("en-GB", {
-            hour12: false,
-        });
+        const time = agora.toISOString().split("T")[1].split(".")[0];
 
         const auth = Buffer
             .from(`${process.env.ASTRO_APP_ID}:${process.env.ASTRO_APP_SECRET}`)
             .toString("base64");
+
+        console.log("AUTH CHECK:", {
+            id: process.env.ASTRO_APP_ID,
+            secret: process.env.ASTRO_APP_SECRET ? "OK" : "MISSING",
+        });
 
         const response = await axios.get(
             "https://api.astronomyapi.com/api/v2/bodies/positions",
@@ -213,7 +216,7 @@ app.get("/ceu", async (req, res) => {
         const rows = response?.data?.data?.table?.rows || [];
 
         const visiveis = rows
-            .filter((p) => p.cells[0].position.altitude.degrees > 0)
+            .filter((p) => p?.cells?.[0]?.position?.altitude?.degrees > 0)
             .map((p) => ({
                 nome: p.entry.name,
                 altitude: p.cells[0].position.altitude.degrees.toFixed(2),
