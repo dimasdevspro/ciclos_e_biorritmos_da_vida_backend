@@ -1,3 +1,4 @@
+const Astronomy = require("astronomy-engine");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -229,11 +230,45 @@ app.get("/ceu", async (req, res) => {
                 };
             });
 
+        // =====================================
+        // CONSTELAÇÃO DOMINANTE DO ZÊNITE
+        // =====================================
+
+        const observer = new Astronomy.Observer(
+            latitude,
+            longitude,
+            elevation
+        );
+
+        // Tempo sideral local
+        const siderealTime = Astronomy.SiderealTime(agora);
+
+        // Ascensão reta aproximada do zênite
+        const ra = siderealTime + (longitude / 15);
+
+        // Normalizar 0-24h
+        const normalizedRA = ((ra % 24) + 24) % 24;
+
+        // Declinação aproximada do zênite
+        const dec = latitude;
+
+        // Descobrir constelação real
+        const constellation = Astronomy.Constellation(
+            normalizedRA,
+            dec
+        );
+
         res.json({
-            visiveis: visiveis || [],
-            total: visiveis?.length || 0,
+            visiveis,
+            total: visiveis.length,
+
+            constelacaoDominante: constellation.name,
+            constelacaoAbreviacao: constellation.symbol,
+
             timestamp: agora,
         });
+
+
 
     } catch (error) {
         console.error("Erro API:", error.response?.data || error.message);
